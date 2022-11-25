@@ -72,7 +72,7 @@ async def handle_location(message: types.Message) -> None:
     # Get the location.
     latitude = str(message.location.latitude)
     longitude = str(message.location.longitude)
-    coordinates = geolocator.reverse(latitude + "," + longitude, language='en')
+    coordinates = geolocator.reverse(latitude + "," + longitude, language='ru')
     address = coordinates.raw['address']
     location = address.get('amenity', '')
 
@@ -94,15 +94,21 @@ async def processing(message: types.Message) -> None:
     global ud, userdata, database
     uid = message.from_id
 
+    # User initialization.
     if uid not in ud:
         await start(message)
 
     # User authorization.
     elif uid not in userdata:
         ud[uid]["state"] = "university"
+
         await message.answer(text="Для того, чтобы отметиться на занятии, "
                                          "необходимо авторизоваться.")
-        await message.answer(text="Выберите свой университет из списка ниже.")
+
+        res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        for university in database:
+            res.add(types.InlineKeyboardButton(text=university, callback_data=university))
+        await message.answer(text="Выберите свой университет из списка ниже.", reply_markup=res)
 
     # User authorization.
     elif ud[uid]["state"] == "university":
@@ -128,6 +134,7 @@ async def processing(message: types.Message) -> None:
     elif ud[uid]["state"] == "name":
         if message.text in database[ud[uid]["university"]][ud[uid]["group"]]:
             userdata[uid] = [message.text, ud[uid]["group"], ud[uid]["university"]]
+            with open('userdata.json', 'w') as f: json.dump(userdata, f)
             
             res = types.ReplyKeyboardMarkup(resize_keyboard=True,
                                     one_time_keyboard=True)
