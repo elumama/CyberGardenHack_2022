@@ -31,12 +31,18 @@ with open('database.json', 'r') as f: database = json.load(f)
 async def start(message: types.Message) -> None:
     """Initializes a dialog."""
     global ud
-    uid = message.from_id
+    uid = str(message.from_id)
 
     # Reset the current state.
     ud[uid] = dict()
     ud[uid]["state"] = "start"
     ud[uid]["base_message"] = message
+
+    # Upload user's data.
+    if uid in userdata:
+        ud[uid]["university"] = userdata[uid][2]
+        ud[uid]["group"] = userdata[uid][1]
+        ud[uid]["name"] = userdata[uid][0]
 
     # Create a keyboard.
     res = types.ReplyKeyboardMarkup(resize_keyboard=True,
@@ -44,7 +50,7 @@ async def start(message: types.Message) -> None:
     res.add(types.KeyboardButton(text="✅ Отметиться на занятии"))
 
     # Reply to the user.
-    await message.answer(text="Добро пожаловать! 👋 Чтобы отметиться на текущем занятии,"
+    await message.answer(text="Добро пожаловать! 👋 Чтобы отметиться на текущем занятии, "
                               "нажмите кнопку ниже.",
                         reply_markup=res)
 
@@ -52,7 +58,6 @@ async def start(message: types.Message) -> None:
 @dp.message_handler(commands=['help'])
 async def help_function(message: types.Message) -> None:
     """Initializes a dialog."""
-    # Reply to the user.
     await message.answer(text="Привет! 👋 При помощи данного бота ты можешь"
      " отметиться на занятии в один клик при помощи геолокации." 
      " Если ты здесь впервые, то сначала необходимо будет пройти"
@@ -66,7 +71,7 @@ async def help_function(message: types.Message) -> None:
 async def handle_location(message: types.Message) -> None:
     """Processes user's location."""
     global ud
-    uid = message.from_id
+    uid = str(message.from_id)
     ud[uid]["state"] = "start"
 
     # Get the location.
@@ -82,7 +87,7 @@ async def process_callback(callback_query: types.CallbackQuery):
     """Handles button presses."""
     global ud
     callback_query = dict(callback_query)
-    uid = callback_query["from"]["id"]
+    uid = str(callback_query["from"]["id"])
     message = ud[uid]["base_message"]
     message.text = callback_query["data"]
     await processing(message)
@@ -92,30 +97,34 @@ async def process_callback(callback_query: types.CallbackQuery):
 async def processing(message: types.Message) -> None:
     """Represents the dialog pipeline."""
     global ud, userdata, database
-    uid = message.from_id
+    uid = str(message.from_id)
 
     # User initialization.
     if uid not in ud:
         await start(message)
 
     # User authorization.
-    elif uid not in userdata:
+    elif uid not in userdata and ud[uid]["state"] == "start":
         ud[uid]["state"] = "university"
 
         await message.answer(text="Для того, чтобы отметиться на занятии, "
                                          "необходимо авторизоваться.")
 
-        res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         for university in database:
             res.add(types.InlineKeyboardButton(text=university, callback_data=university))
         await message.answer(text="Выберите свой университет из списка ниже.", reply_markup=res)
 
-    # User authorization.
+    # Saving user's university.
     elif ud[uid]["state"] == "university":
         if message.text in database:
             ud[uid]["university"] = message.text
             ud[uid]["state"] = "group"
-            await message.answer(text="Введите свою академическую группу.")
+
+            res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+            for group in database[message.text]:
+                res.add(types.InlineKeyboardButton(text=group, callback_data=group))
+            await message.answer(text="Введите свою академическую группу.", reply_markup=res)
         else:
             await message.answer(text="Данного университета не существует."
                                     " Выберите университет из существующих.")
@@ -125,7 +134,11 @@ async def processing(message: types.Message) -> None:
         if message.text in database[ud[uid]["university"]]:
             ud[uid]["group"] = message.text
             ud[uid]["state"] = "name"
-            await message.answer(text="Введите свои фамилию и имя.")
+
+            res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
+            for student in database[ud[uid]["university"]][message.text]:
+                res.add(types.InlineKeyboardButton(text=student, callback_data=student))
+            await message.answer(text="Введите свои фамилию и имя.", reply_markup=res)
         else:
             await message.answer(text="Данной академической группы не существует."
                                     "Введите группу повторно.")
@@ -133,6 +146,8 @@ async def processing(message: types.Message) -> None:
     # Saving user's name.
     elif ud[uid]["state"] == "name":
         if message.text in database[ud[uid]["university"]][ud[uid]["group"]]:
+            ud[uid]["name"] = message.text
+            
             userdata[uid] = [message.text, ud[uid]["group"], ud[uid]["university"]]
             with open('userdata.json', 'w') as f: json.dump(userdata, f)
             
