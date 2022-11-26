@@ -3,6 +3,7 @@
 import json
 import shutil
 import logging
+import requests
 
 from geopy.geocoders import Nominatim
 from aiogram import Bot, Dispatcher, executor, types
@@ -22,8 +23,8 @@ geolocator = Nominatim(user_agent="geoapiExercises")
 
 # Initializing the global variables.
 ud = dict()  # Sessions' data.
-with open('userdata.json', 'r') as f: userdata = json.load(f)
-with open('database.json', 'r') as f: database = json.load(f)
+with open('userdata.json', 'r', encoding='utf-8') as f: userdata = json.load(f)
+with open('database.json', 'r', encoding='utf-8') as f: database = json.load(f)
 
 # Bot's functions.
 
@@ -52,19 +53,18 @@ async def start(message: types.Message) -> None:
     # Reply to the user.
     await message.answer(text="Добро пожаловать! 👋 Чтобы отметиться на текущем занятии, "
                               "нажмите кнопку ниже.",
-                        reply_markup=res)
+                         reply_markup=res)
 
 
 @dp.message_handler(commands=['help'])
 async def help_function(message: types.Message) -> None:
     """Initializes a dialog."""
     await message.answer(text="Привет! 👋 При помощи данного бота ты можешь"
-     " отметиться на занятии в один клик при помощи геолокации." 
-     " Если ты здесь впервые, то сначала необходимо будет пройти"
-     " быструю авторизацию, указав свой университет, группу и имя. "
-     " Во время авторизации ты можешь начать сначала при помощи "
-     " команды /cancel.")
-
+                              " отметиться на занятии в один клик при помощи геолокации."
+                              " Если ты здесь впервые, то сначала необходимо будет пройти"
+                              " быструю авторизацию, указав свой университет, группу и имя. "
+                              " Во время авторизации ты можешь начать сначала при помощи "
+                              " команды /cancel.")
 
 
 @dp.message_handler(content_types=['location'])
@@ -77,10 +77,14 @@ async def handle_location(message: types.Message) -> None:
     # Get the location.
     latitude = str(message.location.latitude)
     longitude = str(message.location.longitude)
-    coordinates = geolocator.reverse(latitude + "," + longitude, language='ru')
+    coordinates = geolocator.reverse(latitude + "," + longitude, language='en')
     address = coordinates.raw['address']
     location = address.get('amenity', '')
+    if location.startswith('И'):  location = location[:7]
 
+    # url = 'http://127.0.0.1:8000/'
+    # visit = int(location == ud[uid]["university"])
+    # requests.post(url, data={'visit':visit})
 
 @dp.callback_query_handler()
 async def process_callback(callback_query: types.CallbackQuery):
@@ -108,7 +112,7 @@ async def processing(message: types.Message) -> None:
         ud[uid]["state"] = "university"
 
         await message.answer(text="Для того, чтобы отметиться на занятии, "
-                                         "необходимо авторизоваться.")
+                                  "необходимо авторизоваться.")
 
         res = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=False)
         for university in database:
@@ -127,7 +131,7 @@ async def processing(message: types.Message) -> None:
             await message.answer(text="Введите свою академическую группу.", reply_markup=res)
         else:
             await message.answer(text="Данного университета не существует."
-                                    " Выберите университет из существующих.")
+                                      " Выберите университет из существующих.")
 
     # Saving user's group.
     elif ud[uid]["state"] == "group":
@@ -141,41 +145,42 @@ async def processing(message: types.Message) -> None:
             await message.answer(text="Введите свои фамилию и имя.", reply_markup=res)
         else:
             await message.answer(text="Данной академической группы не существует."
-                                    "Введите группу повторно.")
+                                      "Введите группу повторно.")
 
     # Saving user's name.
     elif ud[uid]["state"] == "name":
         if message.text in database[ud[uid]["university"]][ud[uid]["group"]]:
             ud[uid]["name"] = message.text
-            
+
             userdata[uid] = [message.text, ud[uid]["group"], ud[uid]["university"]]
-            with open('userdata.json', 'w') as f: json.dump(userdata, f)
-            
+            with open('userdata.json', 'w') as f:
+                json.dump(userdata, f)
+
             res = types.ReplyKeyboardMarkup(resize_keyboard=True,
-                                    one_time_keyboard=True)
+                                            one_time_keyboard=True)
             res.add(types.KeyboardButton(text="📡 Поделиться местоположением",
-                                request_location=True))
+                                         request_location=True))
             await message.answer(text="Для того, чтобы отметиться на занятии, "
-                                "необходимо поделиться своим местоположением."
-                                " Для этого нажмите кнопку ниже.", reply_markup=res)
+                                      "необходимо поделиться своим местоположением."
+                                      " Для этого нажмите кнопку ниже.", reply_markup=res)
         else:
             await message.text(text="Такого ученика не существует в списке"
                                     "данной группы. Введите фамилию и имя повторно.")
-    
+
     # User has already been authorized.
     else:
         res = types.ReplyKeyboardMarkup(resize_keyboard=True,
-                                    one_time_keyboard=True)
+                                        one_time_keyboard=True)
         res.add(types.KeyboardButton(text="📡 Поделиться местоположением",
-                            request_location=True))
+                                     request_location=True))
         await message.answer(text="Для того, чтобы отметиться на занятии, "
-                                "необходимо поделиться своим местоположением."
-                                " Для этого нажмите кнопку ниже.", reply_markup=res)
+                                  "необходимо поделиться своим местоположением."
+                                  " Для этого нажмите кнопку ниже.", reply_markup=res)
 
 
 if __name__ == '__main__':
     # Launch the bot.
-    executor.start_polling(dp, skip_updates=True)  
+    executor.start_polling(dp, skip_updates=True)
 
     # Create a back up of a database.
-    shutil.copy('userdata.json', 'userdata_backup.json')  
+    shutil.copy('userdata.json', 'userdata_backup.json')
