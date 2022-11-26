@@ -15,7 +15,6 @@ function Face() {
   const [aiEnabled, setAiEnabled] = useState(false);
   const [timer, setTimer] = useState(0);
   var person_exists = false;
-  var person_exists1 = false;
   var date_person_here = new Date();
   var time_person_left = 0;
   const [timePersonLeft, setTimePersonLeft] = useState(0);
@@ -30,11 +29,11 @@ function Face() {
     console.log(aiEnabled)
   }
 
-  function inc(a) {
-    setTimePersonLeft(timePersonLeft + a)
+  function inc(time_elapsed) {
+    setTimePersonLeft(timePersonLeft + time_elapsed)
   }
-  function dec(a) {
-    setDieTime(dieTime - a)
+  function dec(time_elapsed) {
+    setDieTime(dieTime - time_elapsed)
   }
   function nul(a) {
     if(a){
@@ -43,9 +42,10 @@ function Face() {
     }
   }
 
-  function checking(a) {
-    if(a) {setCheck("✅");}
-    else {setCheck("⛔️");}
+  function checking(person_detected) {
+    person_detected? setCheck("✅"): setCheck("⛔️")
+    // if(a) {setCheck("✅");}
+    // else {setCheck("⛔️");}
   }
 
 
