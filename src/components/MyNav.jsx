@@ -6,17 +6,22 @@ import {Link} from 'react-router-dom';
 function MyNav() {
   return (
 
+    <div className='back'>
       <div className="nav">
-        <a className='left'>
-        <Link to='/'> Главная</Link>
-        <Link to='/account'> Аккаунт</Link>
-        <Link to='/about'> О разработчиках</Link>
-        </a>
-        <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" draggable="false" display="false">
-          <img src="MISIShunters.svg"className='right' draggable="false" width="50%"/>
-        </a>
 
+        <a href="https://youtu.be/dQw4w9WgXcQ" target="_blank" draggable="false" display="false">
+        <img src="MISIShunters.svg"className='left' draggable="false" width="50%"/>
+        </a>
+        <br/>
+        <a className='right'>
+        <Link to='/' ><a > Главная&nbsp;&nbsp;&nbsp;</a></Link>
+        
+        <Link to='/account'><a > Аккаунт&nbsp;&nbsp;&nbsp;</a></Link>
+        <Link to='/about'><a> О разработчиках&nbsp;&nbsp;&nbsp;</a></Link>
+        </a>
+        
       </div>
+    </div>
 
   );
 }

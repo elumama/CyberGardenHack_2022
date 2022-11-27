@@ -1,18 +1,17 @@
-import { useState } from 'react'
-import React from 'react';
-import reactLogo from '../assets/react.svg'
+import React from 'react'
 import '../App.css'
-import 'bootstrap/dist/css/bootstrap.min.css';
 import Face from "../Face";
 
-
-
 function Home() {
+
+
   return (
-    <div>
+    <div className="App" >
+      
+
       <Face/>
     </div>
   )
 }
 
-export default Home;
+export default Home

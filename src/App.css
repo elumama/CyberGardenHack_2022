@@ -1,48 +1,89 @@
 #root {
-  max-width: 1280px;
+  max-width: 1920px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
-  background-size: cover;
-  background-repeat:no-repeat;
+  /* text-align: center; */
+
 }
-.table1 { 
-  width: 100%; /* Ширина */    
-  padding-right: 30px;
-  box-sizing: border-box; /* Для IE и Opera */
-  font-size: 30x;
-  text-align: center;
+
+div {
+  margin-left: 0;
+  margin-right: 0;
 }
-.webc { 
-  width: 64%;
-  height: 48%;
-  border-radius: 5;
+
+div.mirror {
+  /* -moz-transform: scaleX(-1);
+  -o-transform: scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  transform: scaleX(-1); */
+  padding-top: 10px;
+  width: 100%;
+  filter: FlipV;
+  -ms-filter: 'FlipV';
+
+}
+
+.left {
+  will-change: filter;
+  float: left;
+  margin-left: 20px;
+  padding-top: 5px;
+}
+
+.right {
+  will-change: filter;
+
+  margin-left: 0%;
+  font-size: 200%;
+}
+
+.table1 {
+  width: 100%;
+  /* Ширина */
+  margin: auto;
   box-sizing: border-box;
+  /* Для IE и Opera */
+  font-size: 10px;
+  text-align: left;
+
 }
-.td1 {
-  width:25%;
+
+.table2 { 
+  width: 960px; /* Ширина */    
+  margin: auto;
+  will-change: filter;
+  box-sizing: border-box; /* Для IE и Opera */
+  font-size: 30px;
+  text-align: center;
 }
+
+.left:hover {
+  filter: drop-shadow(0 0 2em #00cb91d3);
+}
+
+.right:hover {
+  filter: drop-shadow(0 0 2em #00cb91d3);
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
   will-change: filter;
 }
-.allPage {
-  width: 600px; /* Ширина */    
-  margin: 0;
-  box-sizing: border-box;
-}
+
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 1em #00a6cbd3);
 }
+
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #00cb91d3);
 }
 
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -54,6 +95,13 @@
   }
 }
 
+.allPage {
+  width: 960px;
+  /* Ширина */
+  margin: auto;
+  box-sizing: border-box;
+}
+
 .card {
   padding: 2em;
 }
@@ -61,36 +109,37 @@
 .read-the-docs {
   color: #888;
 }
-.nav {
-  margin-top: 50px;
-  position: fixed;
-  padding-left: 0;
-  margin-right: 0;
-  top: 0;
-  left: 0;
-  width: 100%;
-  text-align: right;
-  box-sizing: border-box;
+
+input.apple-switch {
+  position: relative;
+  -webkit-appearance: none;
+  outline: none;
+  width: 50px;
+  height: 30px;
+  background-color: #fff;
+  border: 1px solid #D9DADC;
+  border-radius: 50px;
+  box-shadow: inset -20px 0 0 0 #fff;
 }
 
-.left {
-  will-change: filter;
+input.apple-switch:after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  background: transparent;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.2);
+}
 
-  padding-left: 10px;
+input.apple-switch:checked {
+  box-shadow: inset 20px 0 0 0 #4ed164;
+  border-color: #4ed164;
+}
 
-}
-.right {
-  will-change: filter;
-  padding-right: 10px;
-}
-.table1 { 
-  width: 100%; /* Ширина */    
-  margin: auto;
-  padding-right: 30px;
-  box-sizing: border-box; /* Для IE и Opera */
-  font-size: 30x;
-  text-align: center;
-}
-.th {
-  width: 40%;
+input.apple-switch:checked:after {
+  left: 20px;
+  box-shadow: -2px 4px 3px rgba(0, 0, 0, 0.05);
 }

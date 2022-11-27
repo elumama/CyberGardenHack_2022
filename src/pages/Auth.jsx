@@ -2,13 +2,15 @@ import React from 'react';
 import '../App.css';
 import MyForm from "../components/MyForm";
 
+function Auth() {
 
-const Auth = () => {
-    return (
+
+  return (
         
-        <div>
+    <div className='App'>
       <MyForm/>
-        </div>
+  </div>
+
     );
 };
 

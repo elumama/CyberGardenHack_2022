@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useMemo, useState } from "react";
 import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-const Auth = () => {
+import Button from 'react-bootstrap/Button';
 
-    return (
+function Account() {
+
+
+
+  return (
         
-        <div>
-      <input type="checkbox" checked={checked} onChange={() => setChecked(!checked)}/> я студент <br/>
-      <span>{checked ? <h1>geg</h1>
-      : 
-      'галочки нет'
-      }</span>
+    <div className='App'>
+      dgfhgj 
+  </div>
 
-
-        </div>
     );
 };
 
-export default Auth;
+export default Account;

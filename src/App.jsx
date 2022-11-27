@@ -2,11 +2,8 @@ import { useState } from 'react'
 import React from 'react';
 import {  BrowserRouter, Routes, Route} from 'react-router-dom';
 import './App.css'
-import MyNav from "./components/MyNav";
 import AppRouted from "./components/AppRouted";
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-
+import MyNav from "./components/MyNav";
 
 
 function App() {
@@ -17,7 +14,7 @@ function App() {
             
 
     <BrowserRouter>
-    <MyNav/> 
+ <MyNav/>
       <AppRouted/>
       
     </BrowserRouter>
